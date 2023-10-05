@@ -10,7 +10,7 @@ import page.HomePage;
 import page.CalculatorPage;
 import page.YopmailPage;
 
-public class TestCalculator {
+public class TestOfCorrectCostCalculation {
 
     private WebDriver driver;
     private static final String SEARCH_STRING = "Google Cloud Platform Pricing Calculator";
@@ -23,8 +23,8 @@ public class TestCalculator {
         driver.manage().window().maximize();
     }
 
-    @Test(description = "")
-    public void checkCreatingNewItem() {
+    @Test(description = "Check the calculated costs")
+    public void checkCalculatedCosts() {
         SoftAssert softAssertion = new SoftAssert();
 
         CalculatorPage newPaste = new HomePage(driver)
