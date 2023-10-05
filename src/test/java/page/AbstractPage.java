@@ -5,13 +5,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 import java.util.ArrayList;
 
-
 public abstract class AbstractPage {
-    static final Duration WAIT_TIMEOUT_SECONDS = Duration.ofSeconds(10);
+    private static final Duration WAIT_TIMEOUT_SECONDS = Duration.ofSeconds(10);
     protected WebDriver driver;
 
     public void switchToTab(int tabIndex) {
@@ -21,7 +19,6 @@ public abstract class AbstractPage {
         } catch (IndexOutOfBoundsException e) {
             driver.switchTo().window(tabs.get(0));
         }
-
     }
 
     public AbstractPage(WebDriver driver) {
@@ -40,5 +37,10 @@ public abstract class AbstractPage {
     protected void waitForVisibilityOfFrameAndSwitchToIt(WebElement webElement) {
         new WebDriverWait(driver, WAIT_TIMEOUT_SECONDS).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(webElement));
     }
+
+    protected void waitForVisibilityOfFrameAndSwitchToItByIndex(int index) {
+        new WebDriverWait(driver, WAIT_TIMEOUT_SECONDS).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(index));
+    }
+
 
 }

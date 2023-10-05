@@ -9,6 +9,8 @@ import org.testng.asserts.SoftAssert;
 import page.HomePage;
 import page.CalculatorPage;
 import page.YopmailPage;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TestOfCorrectCostCalculation {
 
@@ -16,6 +18,7 @@ public class TestOfCorrectCostCalculation {
     private static final String SEARCH_STRING = "Google Cloud Platform Pricing Calculator";
     private static final String COMPUTE_ENGINE = "Compute Engine";
     private static final String NUMBER_OF_INSTANCES = "4";
+    private static final String PATTERN_DOUBLE = "\\d+[.]\\d+";
 
     @BeforeTest(alwaysRun = true)
     public void browserSetup() {
@@ -48,7 +51,8 @@ public class TestOfCorrectCostCalculation {
                 .selectUsage()
                 .clickAddToEstimate();
 
-        Double costEstimated = newPaste.getEstimatedCost();
+        String costEstimatedString = newPaste.getStringEstimatedCost();
+        Double costEstimated = getDoubleCost(costEstimatedString);
 
         softAssertion.assertTrue(costEstimated != null && costEstimated > 0, "The price hasn't been calculated");
 
@@ -60,9 +64,15 @@ public class TestOfCorrectCostCalculation {
 
         String newRandomEmail = newYopmailPage.copyEmail();
         newPaste.insertEmail(newRandomEmail).sendEmail();
-        Double costEmailed = newYopmailPage.checkInbox().getCostFromEmail();
 
-        softAssertion.assertEquals(costEstimated, costEmailed, "Prices aren't equal");
+        String costEmailedString = newYopmailPage
+                .checkInbox()
+                .waitEmail()
+                .getCostFromEmail();
+
+        Double costEmailed = getDoubleCost(costEmailedString);
+
+        softAssertion.assertEquals(costEmailed, costEstimated, "Costs aren't equal");
         softAssertion.assertAll();
 
     }
@@ -72,4 +82,20 @@ public class TestOfCorrectCostCalculation {
         driver.quit();
         driver = null;
     }
+
+    private Double getDoubleCost(String costString) {
+        costString = costString.replaceAll(",", "");
+        Double costDouble = null;
+        Pattern pattern = Pattern.compile(PATTERN_DOUBLE);
+        Matcher matcher = pattern.matcher(costString);
+        if (matcher.find()) {
+            try {
+                costDouble = Double.parseDouble(matcher.group(0));
+            } catch (NumberFormatException e) {
+                System.out.println("Total Estimated Cost is not a number");
+            }
+        }
+        return costDouble;
+    }
+
 }

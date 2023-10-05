@@ -4,8 +4,10 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import java.time.Duration;
+import java.util.function.Function;
 
 public class YopmailPage extends AbstractPage {
 
@@ -27,8 +29,13 @@ public class YopmailPage extends AbstractPage {
     private WebElement searchButtonRefresh;
 
     @FindBy(xpath = "//h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'),'total estimated monthly cost')]//following::td/h3[1]")
-
     private WebElement searchCostEmailed;
+
+    @FindBy(id = "nbmail")
+    private WebElement searchFlagNewMail;
+
+    @FindBy(id = "ifmail")
+    private WebElement searchFrameMail;
 
     public YopmailPage(WebDriver driver) {
         super(driver);
@@ -63,19 +70,27 @@ public class YopmailPage extends AbstractPage {
         return this;
     }
 
-    public Double getCostFromEmail() {
-        waitForElementToBeClickable(searchButtonRefresh).click();
+    public YopmailPage waitEmail() {
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(30))
+                .pollingEvery(Duration.ofSeconds(2));
 
-        new WebDriverWait(driver, WAIT_TIMEOUT_SECONDS).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("ifmail"));
+       wait.until(new Function<WebDriver, WebElement>() {
+            public WebElement apply(WebDriver driver) {
+                WebElement element = searchFlagNewMail;
+                String getTextOnPage = element.getText();
+                if(!getTextOnPage.equals("1 mail")){
+                    waitForElementToBeClickable(searchButtonRefresh).click();
+                }
+                return element;
+            }
+        });
+        return this;
+    }
 
-        String costString = waitForVisibilityOfElement(searchCostEmailed).getText().replaceAll("[^0-9.]", "");
-        Double costDouble = null;
-        try {
-            costDouble = Double.parseDouble(costString);
-        } catch (NumberFormatException e) {
-            System.out.println("Total Estimated Monthly Cost isn't a number ");
-        }
-        return costDouble;
+    public String getCostFromEmail() {
+        waitForVisibilityOfFrameAndSwitchToIt(searchFrameMail);
+        return waitForVisibilityOfElement(searchCostEmailed).getText();
     }
 
 }

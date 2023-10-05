@@ -3,11 +3,6 @@ package page;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CalculatorPage extends AbstractPage {
 
@@ -101,7 +96,7 @@ public class CalculatorPage extends AbstractPage {
     }
 
     public CalculatorPage selectFrames() {
-        new WebDriverWait(driver, WAIT_TIMEOUT_SECONDS).until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(0));
+        waitForVisibilityOfFrameAndSwitchToItByIndex(0);
         waitForVisibilityOfFrameAndSwitchToIt(searchFrameInner);
         return this;
     }
@@ -176,19 +171,8 @@ public class CalculatorPage extends AbstractPage {
         return this;
     }
 
-    public Double getEstimatedCost() {
-        String costString = waitForVisibilityOfElement(searchEstimatedCost).getText().replaceAll(",", "");
-        Double costDouble = null;
-        Pattern pattern = Pattern.compile("\\d+[.]\\d+");
-        Matcher matcher = pattern.matcher(costString);
-        if (matcher.find()) {
-            try {
-                costDouble = Double.parseDouble(matcher.group(0));
-            } catch (NumberFormatException e) {
-                System.out.println("Total Estimated Cost is not a number");
-            }
-        }
-        return costDouble;
+    public String getStringEstimatedCost() {
+        return waitForVisibilityOfElement(searchEstimatedCost).getText();
     }
 
     public void clickEmailEstimate() {
@@ -203,7 +187,6 @@ public class CalculatorPage extends AbstractPage {
     }
 
     public void sendEmail() {
-        ;
         waitForElementToBeClickable(searchButtonSendEmail).click();
     }
 
