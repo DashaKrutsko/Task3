@@ -18,6 +18,7 @@ public class TestOfCorrectCostCalculation {
     private static final String SEARCH_STRING = "Google Cloud Platform Pricing Calculator";
     private static final String COMPUTE_ENGINE = "Compute Engine";
     private static final String NUMBER_OF_INSTANCES = "4";
+    private static final String FLAG_NEW_MAIL = "1 mail";
     private static final String PATTERN_DOUBLE = "\\d+[.]\\d+";
 
     @BeforeTest(alwaysRun = true)
@@ -67,7 +68,7 @@ public class TestOfCorrectCostCalculation {
 
         String costEmailedString = newYopmailPage
                 .checkInbox()
-                .waitEmail()
+                .waitEmail(FLAG_NEW_MAIL)
                 .getCostFromEmail();
 
         Double costEmailed = getDoubleCost(costEmailedString);
@@ -92,7 +93,7 @@ public class TestOfCorrectCostCalculation {
             try {
                 costDouble = Double.parseDouble(matcher.group(0));
             } catch (NumberFormatException e) {
-                System.out.println("Total Estimated Cost is not a number");
+                System.out.println("Total cost isn't a number");
             }
         }
         return costDouble;

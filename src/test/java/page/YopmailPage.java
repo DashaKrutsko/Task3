@@ -70,19 +70,22 @@ public class YopmailPage extends AbstractPage {
         return this;
     }
 
-    public YopmailPage waitEmail() {
+    public YopmailPage waitEmail(String flagNewMail) {
+
         Wait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(Duration.ofSeconds(30))
                 .pollingEvery(Duration.ofSeconds(2));
 
-       wait.until(new Function<WebDriver, WebElement>() {
+        WebElement newMail = wait.until(new Function<WebDriver, WebElement>() {
             public WebElement apply(WebDriver driver) {
                 WebElement element = searchFlagNewMail;
                 String getTextOnPage = element.getText();
-                if(!getTextOnPage.equals("1 mail")){
+                if (getTextOnPage.equals(flagNewMail)) {
+                    return element;
+                } else {
                     waitForElementToBeClickable(searchButtonRefresh).click();
+                    return null;
                 }
-                return element;
             }
         });
         return this;
